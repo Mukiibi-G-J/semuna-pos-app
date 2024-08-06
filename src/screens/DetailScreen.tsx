@@ -6,7 +6,7 @@ import Icon from "react-native-vector-icons/MaterialIcons";
 import { SecondaryButton } from "../components/Button";
 import { COLORS } from "../constants";
 
-export const DetailsScreen: React.FC<{ navigation:any, route:any }> = ({
+export const DetailsScreen: React.FC<{ navigation: any; route: any }> = ({
   navigation,
   route,
 }) => {
@@ -14,7 +14,6 @@ export const DetailsScreen: React.FC<{ navigation:any, route:any }> = ({
   console.log(item);
   return (
     <SafeAreaView style={{ backgroundColor: COLORS.white }}>
-
       <View style={style.header}>
         <Icon
           name="arrow-back-ios"
@@ -34,7 +33,12 @@ export const DetailsScreen: React.FC<{ navigation:any, route:any }> = ({
             height: 280,
           }}
         >
-          <Image source={item.image} style={{ height: 220, width: 220 }} />
+          <Image
+            source={{
+              uri: `${item.product_image}`,
+            }}
+            style={{ height: 220, width: 220 }}
+          />
         </View>
         <View style={style.details}>
           <View
@@ -47,19 +51,13 @@ export const DetailsScreen: React.FC<{ navigation:any, route:any }> = ({
             <Text
               style={{ fontSize: 25, fontWeight: "bold", color: COLORS.white }}
             >
-              {item.name}
+              {item.product_name}
             </Text>
             <View style={style.iconContainer}>
               <Icon name="favorite-border" color={COLORS.primary} size={25} />
             </View>
           </View>
-          <Text style={style.detailsText}>
-            Lorem Ipsum is simply dummy text of the printing and typesetting
-            industry. Lorem Ipsum has been the industry's standard dummy text
-            ever since the 1500s, when an unknown printer took a galley of type
-            and scrambled it to make a type specimen book. It has survived not
-            only five centuries.
-          </Text>
+          <Text style={style.detailsText}></Text>
           <View style={{ marginTop: 40, marginBottom: 40 }}>
             <SecondaryButton
               title="Add To Cart"

@@ -10,6 +10,7 @@ import {
   FlatList,
   TouchableHighlight,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import { COLORS, PRODUCTS } from "../constants";
@@ -23,12 +24,14 @@ import axiosInstance from "../helpers/axios";
 const Card: React.FC<{
   product: Product;
   navigation: any;
-}> = ({ product, navigation }) => {
+  quantity: any;
+}> = ({ product, navigation, quantity }) => {
   const { state, dispatch } = useContext(Store);
   const {
     cart: { cartProducts },
   } = state;
-  cartProducts;
+
+  // cartProducts;
   const addToCart: (args: cartProduct) => void = ({ product }) => {
     const existItem = cartProducts.find((x: any) => x.id === product.id)
       ? true
@@ -42,7 +45,7 @@ const Card: React.FC<{
   };
 
   // dispatch({ type: "CART_ADD_ITEM", payload: { ...product, quantity } });
-
+  // console.log(product)
   return (
     <TouchableHighlight
       underlayColor={COLORS.white}
@@ -51,11 +54,20 @@ const Card: React.FC<{
     >
       <View style={style.card}>
         <View style={{ alignItems: "center" }}>
-          <Image source={product.image} style={{ height: 120, width: 120 }} />
+          {/* <Image
+            source={product.product_image}
+            style={{ height: 120, width: 120 }}
+          /> */}
+          <Image
+            style={{ height: 120, width: 120 }}
+            source={{
+              uri: `${product.product_image}`,
+            }}
+          />
         </View>
         <View style={{ marginHorizontal: 20 }}>
           <Text style={{ fontSize: 18, fontWeight: "bold" }}>
-            {product.name}
+            {product.product_name}
           </Text>
           <Text style={{ fontSize: 14, color: COLORS.grey, marginTop: 2 }}>
             {product.description}
@@ -72,7 +84,14 @@ const Card: React.FC<{
           <Text style={{ fontSize: 18, fontWeight: "bold", color: "#000" }}>
             UGX {product.price.toLocaleString()}
           </Text>
-          <TouchableOpacity onPress={() => addToCart({ product })}>
+          <TouchableOpacity
+            onPress={() =>
+              addToCart({
+                product,
+                quantity: 1,
+              })
+            }
+          >
             <View style={style.addToCartBtn}>
               <Icon name="add" size={20} color={COLORS.white} />
             </View>
@@ -84,26 +103,50 @@ const Card: React.FC<{
 };
 export const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const [productQuantity, setProductQuantity] = useState(1);
+  const [searchData, setSearchData] = useState<Product[]>([]);
+  const [searchText, setSearchText] = useState("");
+  const [isLoading, setLoading] = useState(false);
   const { state, dispatch } = useContext(Store);
+  const {
+    getProducts: { products },
+  } = state;
   useEffect(() => {
     const fetchData = async () => {
       try {
         const res = await axiosInstance.get("/products/");
         dispatch({
-          type: "GET_CONTACTS",
-          payload: res.data,
+          type: "GET_PRODUCTS",
+          payload: res.data.slice(0, 10),
         });
-        console.log(res.data);
+        // console.log(res.data);
+        // console.log(products);
       } catch (error) {
-        console.log(error.response.data);
-        console.log("Error fetching data:", error.message);
-        console.error("Axios error:", error.message);
-        console.error("Axios request:", error.config);
+        // console.log(error.response?.data);
+        // console.log("Error fetching data:", error.message);
+        // console.error("Axios error:", error.message);
+        // console.error("Axios request:", error.config);
       }
     };
 
     fetchData();
   }, []);
+
+  const searchProduct = async (text: any) => {
+    setLoading(true);
+    console.log(text);
+    try {
+      const res = await axiosInstance.get(`/products/filter/?q=${text}`);
+
+      if (res.data) {
+        setSearchData(res.data);
+        console.log(searchData);
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error("Error fetching products:", error);
+      // Handle the error, e.g., show an error message to the user
+    }
+  };
   return (
     <SafeAreaView>
       <ScrollView>
@@ -142,23 +185,35 @@ export const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             <Icon name="search" size={28} color="grey" />
             <TextInput
               style={{ flex: 1, fontSize: 18 }}
-              placeholder="Search for food"
+              placeholder="Search for products"
+              onChangeText={(text) => setSearchText(text)}
             />
           </View>
-          <View style={style.sortBtn}>
-            <Icon name="tune" size={28} color={COLORS.white} />
-          </View>
+          {/* {searchData.map((item) => (
+            <View key={item.id}>
+              <Text>{item.product_name}</Text>
+            </View>
+          ))} */}
+          <TouchableOpacity onPress={() => searchProduct(searchText)}>
+            <View style={style.sortBtn}>
+              <Icon name="tune" size={28} color={COLORS.white} />
+            </View>
+          </TouchableOpacity>
         </View>
         <View>{/* <ListCategories /> */}</View>
         <View style={style.productColumn}>
-          {PRODUCTS.map((item) => (
-            <Card
-              key={item.id}
-              product={item}
-              navigation={navigation}
-              quantity={productQuantity}
-            />
-          ))}
+          {isLoading ? (
+            <ActivityIndicator />
+          ) : (
+            searchData?.map((item) => (
+              <Card
+                key={item.id}
+                product={item}
+                navigation={navigation}
+                quantity={productQuantity}
+              />
+            ))
+          )}
         </View>
         {/* <FlatList
           showsVerticalScrollIndicator={false}

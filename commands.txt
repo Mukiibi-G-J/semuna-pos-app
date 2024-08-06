@@ -1,2 +1,2 @@
 npx react-native start --port 8889
-npx react-native run-android --port 8889  
+npx react-native run-android --port 8889

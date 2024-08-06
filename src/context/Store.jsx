@@ -47,18 +47,18 @@ function reducer(state, action) {
 
     case "CART_ADD_PRODUCT": {
       const newProduct = action.payload;
-      console.log(newProduct,"new product")
+      console.log(newProduct, "new product");
       const existProduct = state.cart?.cartProducts.find(
         (product) => product.id === newProduct.id
       );
-      console.log(existProduct, "existproduct")
+      console.log(existProduct, "existproduct");
       const cartProducts = existProduct
         ? state.cart?.cartProducts.map((item) =>
             item.id === existProduct.id ? newProduct : item
           )
         : [...state.cart?.cartProducts, newProduct];
-      
-        console.log(cartProducts,"Affer adding")
+
+      console.log(cartProducts, "Affer adding");
       AsyncStorage.setItem("cartProducts", JSON.stringify(cartProducts));
       return {
         ...state,
@@ -72,17 +72,20 @@ function reducer(state, action) {
       const cartProducts = state.cart?.cartProducts.filter(
         (item) => item.id !== action.payload[0].id
       );
-      AsyncStorage.setItem("cartItems", JSON.stringify(cartProducts));
+      AsyncStorage.setItem("cartProducts", JSON.stringify(cartProducts));
       return { ...state, cart: { ...state.cart, cartProducts } };
     }
+    case "REMOVE_ALL": {
+      AsyncStorage.removeItem("cartProducts");
+      return { ...state, cart: { ...state.cart, cartProducts: [] } };
+    }
 
-    case "GET_CONTACTS": {
-      console.log(payload);
+    case "GET_PRODUCTS": {
       return {
         ...state,
         getProducts: {
           ...state.getProducts,
-          products: payload,
+          products: action.payload,
         },
       };
     }
@@ -105,7 +108,7 @@ export const StoreProvider = ({ children }) => {
         let cartProductsRaw = await AsyncStorage.getItem("cartProducts");
         let initialCartProducts = JSON.parse(cartProductsRaw) ?? [];
         console.log(initialCartProducts, "initialCartProducts");
-        dispatch({ type: "INITIAL_STATE", payload: initialCartProducts });
+        dispatch({ type: "SET_INITIAL_STATE", payload: initialCartProducts });
       } catch (error) {
         console.error("Error loading initial state:", error);
       }

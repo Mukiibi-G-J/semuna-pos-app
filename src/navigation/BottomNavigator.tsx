@@ -5,6 +5,7 @@ import { HomeScreen, CartScreen } from "../screens/index";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { COLORS } from "../constants";
 import { View } from "react-native";
+import StockTake from "../screens/StockTake";
 
 const Tab = createBottomTabNavigator();
 
@@ -20,7 +21,7 @@ export const BottomNavigator = () => {
           height: 55,
           borderTopWidth: 0,
           elevation: 0,
-          marginTop:30
+          marginTop: 30,
         },
       }}
     >
@@ -33,7 +34,7 @@ export const BottomNavigator = () => {
           ),
         }}
       />
-      <Tab.Screen
+      {/* <Tab.Screen
         name="LocalMall"
         component={HomeScreen}
         options={{
@@ -41,10 +42,10 @@ export const BottomNavigator = () => {
             <Icon name="local-mall" color={color} size={28} />
           ),
         }}
-      />
+      /> */}
       <Tab.Screen
-        name="Search"
-        component={HomeScreen}
+        name="StockTake"
+        component={StockTake}
         options={{
           tabBarIcon: ({ color }) => (
             <View
@@ -61,12 +62,12 @@ export const BottomNavigator = () => {
                 elevation: 5,
               }}
             >
-              <Icon name="search" color={COLORS.primary} size={28} />
+              <Icon name="inventory" color={COLORS.primary} size={28} />
             </View>
           ),
         }}
       />
-      <Tab.Screen
+      {/* <Tab.Screen
         name="Favorite"
         component={HomeScreen}
         options={{
@@ -74,7 +75,7 @@ export const BottomNavigator = () => {
             <Icon name="favorite" color={color} size={28} />
           ),
         }}
-      />
+      /> */}
       <Tab.Screen
         name="Cart"
         component={CartScreen}
